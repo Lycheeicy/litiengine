@@ -1,4 +1,5 @@
 
+import net.ltgt.gradle.errorprone.CheckSeverity
 buildscript {
   repositories {
     mavenCentral()
@@ -37,10 +38,10 @@ repositories {
 }
 
 dependencies {
-	//annotationProcessor "com.uber.nullaway:nullaway:0.7.9"
-	//compileOnly "com.google.code.findbugs:jsr305:3.0.2"
-	//errorprone "com.google.errorprone:error_prone_core:2.3.2"
-	//errorproneJavac "com.google.errorprone:javac:9+181-r4173-1"
+	annotationProcessor "com.uber.nullaway:nullaway:0.7.9"
+	compileOnly "com.google.code.findbugs:jsr305:3.0.2"
+	errorprone "com.google.errorprone:error_prone_core:2.3.2"
+	errorproneJavac "com.google.errorprone:javac:9+181-r4173-1"
 	errorprone("com.google.errorprone:error_prone_core:2.3.4")
   compile 'net.java.jinput:jinput:2.0.9'
   compile 'net.java.jinput:jinput:2.0.9:natives-all'
@@ -52,15 +53,19 @@ dependencies {
   }
 
 //import net.ltgt.gradle.errorprone.CheckSeverity
-
-//tasks.withType(JavaCompile){
-//	if(!name.toLowerCase().contains("test")){
-//		options.errorprone{
-//			check("NullAway",CheckSeverity.ERROR)
-//			option("NullAway:AnnotatedPackages","com.uber")		
-//		}
-//	}
-//}
+//-XepOpt:NullAway:AnnotatedPackages=src,tests=
+tasks.withType(JavaCompile).configureEach{
+	options.errorprone.errorproneArgs << "-Xep:NullAway:ERROR" << "-XepOpt:NullAway:AnnotatedPackages=de.gurkenlabs.litiengine"
+}
+tasks.withType(JavaCompile){
+	if(!name.toLowerCase().contains("test")){
+		options.errorprone{
+			
+			check("NullAway",CheckSeverity.ERROR)
+			option("NullAway:AnnotatedPackages","com.uber")		
+		}
+	}
+}
 
   compile 'com.code-disaster.steamworks4j:steamworks4j:1.8.0'
   
@@ -155,6 +160,7 @@ tasks.withType(JavaCompile) {
 
 tasks.withType(JavaCompile).configureEach{
 	options.errorprone.disableWarningsInGeneratedCode = true
+	options.errorprone.disableAllChecks = true;
 }
 
 //tasks.register("compileCustom",JavaCompile){
